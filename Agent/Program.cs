@@ -25,7 +25,9 @@ class Program
                 var client = new ElasticClient(settings);
                 services.AddSingleton<IElasticClient>(client);
                 services.AddScoped<IElasticSearchService, ElasticSearchService>();
+                services.AddScoped<IStockService, StockService>();
 
+                services.AddHttpClient();
 
                 // پیکربندی Quartz
                 services.AddQuartz(q =>
@@ -33,16 +35,16 @@ class Program
                     q.UseMicrosoftDependencyInjectionJobFactory();
 
                     // جاب روزانه
-                    //var dailyJobKey = new JobKey("DailyStockDataJob");
-                    //q.AddJob<DailyStockDataJob>(opts => opts.WithIdentity(dailyJobKey));
-                    //q.AddTrigger(opts => opts
-                    //    .ForJob(dailyJobKey)
-                    //    .WithIdentity("DailyStockDataJob-trigger")
-                    //        .StartNow()); // اجرای فوری
-                        //.WithCronSchedule("0 0 14 * * ?")); // هر روز ساعت 2 بعد از ظهر
+                    var dailyJobKey = new JobKey("DailyStockDataJob");
+                q.AddJob<DailyStockDataJob>(opts => opts.WithIdentity(dailyJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(dailyJobKey)
+                    .WithIdentity("DailyStockDataJob-trigger")
+                        .StartNow()); // اجرای فوری
+                    //.WithCronSchedule("0 0 14 * * ?")); // هر روز ساعت 2 بعد از ظهر
 
-                    // جاب هفتگی
-                    var weeklyJobKey = new JobKey("WeeklyStockDataJob");
+                // جاب هفتگی
+                var weeklyJobKey = new JobKey("WeeklyStockDataJob");
                     q.AddJob<WeeklyStockDataJob>(opts => opts.WithIdentity(weeklyJobKey));
                     q.AddTrigger(opts => opts
                         .ForJob(weeklyJobKey)
@@ -50,13 +52,13 @@ class Program
                                                .StartNow()); // اجرای فوری
                         //.WithCronSchedule("0 0 16 ? * WED"));  // هر چهارشنبه ساعت 4 بعد از ظهر
 
-                    // جاب ماهانه
-                    var monthlyJobKey = new JobKey("MonthlyStockDataJob");
-                    q.AddJob<MonthlyStockDataJob>(opts => opts.WithIdentity(monthlyJobKey));
-                    q.AddTrigger(opts => opts
-                        .ForJob(monthlyJobKey)
-                        .WithIdentity("MonthlyStockDataJob-trigger")
-                        .WithCronSchedule("0 0 0 1 * ?")); // هر اول ماه ساعت 12 صبح
+                // جاب ماهانه
+                var monthlyJobKey = new JobKey("MonthlyStockDataJob");
+                q.AddJob<MonthlyStockDataJob>(opts => opts.WithIdentity(monthlyJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(monthlyJobKey)
+                    .WithIdentity("MonthlyStockDataJob-trigger")
+                    .WithCronSchedule("0 0 0 1 * ?")); // هر اول ماه ساعت 12 صبح
                 });
 
                 services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

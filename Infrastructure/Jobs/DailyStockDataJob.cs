@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Domain.Interfaces;
 using Domain.Stock;
 using Quartz;
@@ -38,6 +39,10 @@ namespace Infrastructure.Jobs
 
                 await _elasticSearchService.IndexStockDataAsync(stockData);
             }
+
+          //var xx=await  _elasticSearchService.GetAllStockDataAsync();
+
+
         }
     }
 }

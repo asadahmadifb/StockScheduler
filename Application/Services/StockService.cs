@@ -13,9 +13,9 @@ namespace Application.Services
     {
         private readonly HttpClient _httpClient;
 
-        public StockService(HttpClient httpClient)
+        public StockService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         public async Task<List<StockPriceResponse>> GetAllClosingDayAsync()
